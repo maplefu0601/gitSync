@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
+var config = require('./config.js');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
@@ -58,7 +59,8 @@ app.use(function(err, req, res, next) {
 
 
 app.listen(6600, function () {
-  console.log('app listening on port 6600!');
+	console.log('app listening on port 6600!');
+	config.checkConfig();
 });
 
 module.exports = app;
