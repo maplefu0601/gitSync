@@ -148,7 +148,8 @@ function doGitChanged(req, res) {
 	});
 }
 
-router.get('/markdown', function(req, res) {
+router.get('/markdown', doMarkdown);
+function doMarkdown(req, res) {
 	var name = req.query.name;
 	var pdfFolder = config.pdf.destPath;
 	var dataFolder = config.gitdata.gitFolder;
@@ -156,9 +157,10 @@ router.get('/markdown', function(req, res) {
 	Params.init(req, res);
 	new MarkDown(req, res).convertToPdf(name, dataFolder, pdfFolder);
 
-});
+};
 
-router.get('/generateHtml', function(req, res) {
+router.get('/generateHtml', doGenerateHtml);
+function doGenerateHtml(req, res) {
 
 	var name = req.query.name;
 	var dataFolder = config.gitdata.gitFolder + name;
@@ -167,7 +169,7 @@ router.get('/generateHtml', function(req, res) {
 	console.log('generate site from '+dataFolder+' to '+htmlFolder+' for  '+name);
 
 	new MarkDown(req, res).generateHtml(name, dataFolder, htmlFolder);
-});
+};
 
 
 module.exports = router;
