@@ -182,6 +182,19 @@ function doGenerateHtml(req, res) {
 	new MarkDown(req, res).generateHtml(name, dataFolder, htmlFolder);
 };
 
+router.get('/saveConfig', function(req, res) {
+	
+	var value = req.query.value;
+
+	config.saveConfig(value);
+});
+
+router.get('/updateConfig', function(req, res) {
+	
+	var value = req.query.value;
+
+	config.updateConfig(value);
+});
 
 module.exports = router;
 
