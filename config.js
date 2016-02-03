@@ -19,6 +19,18 @@ var Config = {
 			
 		});
 	},
+
+	saveConfig : function(data) {
+		
+		fs.writeFile('./config.json', data, function(err) {
+			
+			if(err) {
+				console.log('error writing to config.json. '+ err);
+			} else {
+				console.log('saved config.json. \n' + data);
+			}
+		});
+	},
 };
 
 function createFolder(dirPath, mode, callback) {
@@ -37,6 +49,9 @@ function createFolder(dirPath, mode, callback) {
 	});
 }
 
+//for test
+//config.config.autoCreatePdf = true;
+//Config.saveConfig(JSON.stringify(config));
 
 module.exports = Config;
 
