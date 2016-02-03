@@ -41,7 +41,8 @@ var MarkDown = function(req, res) {
 		convertToPdf : function(name, dataFolder, pdfFolder, callback) {
 			var self = this;
 			console.log('converting '+ name);
-			var cmd = util.format('cd %s && mkdocs2pandoc > %s && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s', dataFolder, name+'.pd', pdfFolder+'.pdf', name+'.pd');
+			var nodePath = process.cwd() + '/public/' + name + '.pdf';
+			var cmd = util.format('cd %s && mkdocs2pandoc > %s && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s && ln -sf %s %s', dataFolder, name+'.pd', pdfFolder+'.pdf', name+'.pd', pdfFolder+'.pdf', nodePath);
 			
 			console.log(cmd);
 			var child = exec(cmd);
@@ -68,12 +69,14 @@ var MarkDown = function(req, res) {
 		},
 
 		generateHtml : function(name, dataFolder, htmlFolder) {
+				//res.render('gdcdocs', {'linkWeb': name, 'linkPdf':''});
 			console.log('generate website from '+dataFolder+' to '+htmlFolder+' for '+name);
 			var nodePath = process.cwd() + '/public/'+name;
 			var cmd = util.format('cd %s && mkdocs build -d %s && ln -sf %s %s', dataFolder, htmlFolder, htmlFolder, nodePath);
 			console.log(cmd);
 			newExec(cmd, function(stdout) {
 				console.log('--------->-'+stdout);
+				//res.render('gdcdocs', {'linkWeb': name, 'linkPdf':''});
 				res.write(stdout);
 				res.end();
 			});

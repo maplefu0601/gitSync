@@ -39,6 +39,28 @@ var https = require('https'),
   
       user : testHub.getUser(),
   
+	  getAllRepos : function(func) {
+		
+		if(this.user) {
+			this.user.repos(function(error, repos) {
+			
+				if(error) {
+				} else {
+					
+					var ret = [];
+					repos.forEach(function(repo) {
+						
+						ret.push(repo.name);
+					});
+
+					if(func) {
+						func(ret);
+					}
+				}
+			});	
+		}
+	  },
+
       getRepos : function(repoName, func) {
   
           if(this.user) {

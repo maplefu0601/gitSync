@@ -200,5 +200,16 @@ router.get('/updateConfig', function(req, res) {
 	res.send(value);
 });
 
+router.get('/gdcdocs', function(req, res) {
+	GitHubUser.getAllRepos(function(repos) {
+		console.log(repos);
+		res.render('gdcdocs', {
+			repos: repos,
+			linkWeb: '',
+			linkPdf: ''
+		});	
+	});	
+});
+
 module.exports = router;
 
