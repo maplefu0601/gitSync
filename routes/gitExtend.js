@@ -8,13 +8,6 @@ var https = require('https'),
   
     var GitHubApi = require("github-api");
 
-function test() {
-	return {
-		a: function() {},
-		b: function() {}
-	}
-}
-console.log(test.a);
   var Params = {
       req : null,
       res : null,
@@ -185,38 +178,59 @@ var GitHubRepoHook = function(userName, repoName) {
  */
      },
  
-    getGit : function(folder, name, url) {
+    getGit : function(folder, name, url, callback) {
          console.log('doing.......'+url);
          var self = this;
          return function(exists) {
              console.log(name + ' exists ? '+exists);
              if(exists) {
-                 self.gitPull(folder, name);
+                 self.gitPull(folder, name, callback);
              } else {
-                 self.gitClone(folder, url, name);
+                 self.gitClone(folder, url, name, callback);
              }
          }
      },
  
-     gitPull : function(folder, name) {
+     gitPull : function(folder, name, callback) {
          var cmd = util.format('cd %s && git --git-dir=%s/.git checkout', folder, name);
          console.log('----gitPull===' + cmd);
          exec(cmd, catchError);
          cmd = util.format('cd %s && git fetch --all && git reset --hard origin/master', folder+name);
          console.log('----gitPull===' + cmd);
-         exec(cmd, catchError);
-         Params.res.jsonp({
-             'info': 'checking out '+name
-         });
+         var child = exec(cmd);
+		 var ret = "";
+		 child.stdout.on('data', function(d) {
+			ret += d;
+		 });
+		 child.stdout.on('end', function() {
+			if(callback) {
+				res.write(ret);
+				callback(ret);
+			}
+		 });
+         //Params.res.jsonp({
+         //    'info': 'checking out '+name
+         //});
      },
  
-     gitClone : function(folder, url, name) {
+     gitClone : function(folder, url, name, callback) {
          var cmd = util.format('cd %s && git clone %s %s', folder, url, name);
          console.log('------gitClone---' + cmd);
-         exec(cmd, catchError);
-         Params.res.jsonp({
-             'info': 'cloning '+name
-         });
+         var child = exec(cmd);
+		 var ret = "";
+		 child.stdout.on('data', function(d) {
+			ret += d;
+		 });
+		 child.stdout.on('end', function() {
+			if(callback) {
+				res.write(ret);
+				callback(ret);
+			}
+		 });
+         //exec(cmd, catchError);
+         //Params.res.jsonp({
+         //    'info': 'cloning '+name
+         //});
      }
  
      }

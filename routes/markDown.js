@@ -38,16 +38,32 @@ var MarkDown = function(req, res) {
 			return exec(cmd, catchError);
 		},
 
-		convertToPdf : function(folder) {
+		convertToPdf : function(name, dataFolder, pdfFolder, callback) {
 			var self = this;
-			console.log('converting '+ folder);
-			var pd = this.convertToPd(folder);
-			var pdf = folder + '.pdf';
-			console.log('converting to pdf file ' + pdf);
-			setTimeout(function() {
-			self.pdToPdf(folder, pd, pdf);
+			console.log('converting '+ name);
+			var cmd = util.format('cd %s && mkdocs2pandoc > %s && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s', dataFolder, name+'.pd', pdfFolder+'.pdf', name+'.pd');
+			
+			console.log(cmd);
+			var child = exec(cmd);
+			var ret = "";
+			child.stdout.on('data', function(d) {
+				ret += d;
+			});
+			child.stdout.on('end', function() {
+				//res.write(ret);
+				//res.end();
+				if(callback) {
+					callback(ret);
+				}
+			});
+			
+			//var pd = this.convertToPd(folder);
+			//var pdf = folder + '.pdf';
+			//console.log('converting to pdf file ' + pdf);
+			//setTimeout(function() {
+			//self.pdToPdf(folder, pd, pdf);
 
-			}, 1000);
+			//}, 1000);
 
 		},
 

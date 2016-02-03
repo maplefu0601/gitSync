@@ -140,7 +140,18 @@ function doGitChanged(req, res) {
 		console.log('start.........'+name);	
 		var dataFolder = config.gitdata.gitFolder;
 		try {
-			path.exists(dataFolder + name, new GitHub(req, res).getGit(dataFolder, name, url));
+			path.exists(dataFolder + name, new GitHub(req, res).getGit(dataFolder, name, url, function(d) {
+				var autoGenWeb = config.config.autoGenWebSite;
+				
+				if(autoGenWeb) {
+					doGenerateHtml(req, res);
+				}
+
+				var autoGenPdf = config.config.autoCreatePdf;
+				if(autoGenPdf) {
+					doMarkdown(req, res);	
+				}
+			}));
 		} catch(err) {
 			console.log('git change error: '+err);
 		}
@@ -151,8 +162,8 @@ function doGitChanged(req, res) {
 router.get('/markdown', doMarkdown);
 function doMarkdown(req, res) {
 	var name = req.query.name;
-	var pdfFolder = config.pdf.destPath;
-	var dataFolder = config.gitdata.gitFolder;
+	var pdfFolder = config.pdf.destPath + name;
+	var dataFolder = config.gitdata.gitFolder + name;
 	console.log('-----markdown----from '+dataFolder+' to '+pdfFolder+' for '+name);
 	Params.init(req, res);
 	new MarkDown(req, res).convertToPdf(name, dataFolder, pdfFolder);
