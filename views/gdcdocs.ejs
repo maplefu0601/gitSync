@@ -17,6 +17,11 @@
 		<button id='createHtml'>Generate HTML</button>
 		<button id='toPdf'>Convert To PDF</button>
 	</div>
+	<br><br>
+	<div>
+		<a id='idLinkWeb' href='http://www.google.ca'>Demo Web</a><br>
+		<a id='idLinkPdf' href='http://www.google.ca'>Get PDF</a><br>
+	</div>
 
 	<div id='log'>
 	</div>
@@ -86,11 +91,17 @@
 				});
 
 				//change if need auto pull data when repository changed
-				$('#chkBoxGitPull').change(function() {
-				
-					var checked = $('#chkBoxGitPull').val($(this).is(':checked'));
+				$('#chkBoxGitPull').click(function() {
+					var repoName = ($('#repoName')[0].value);
+					if(repoName.length === 0) {
+						alert('Need repository name.');
+						return;
+					}
+					var checked = $('#chkBoxGitPull').is(':checked');
 					//add resopitory name to the list
-					var data = {config: {repositoryNameAutoMonitorGitChange:['test-gdcdocs']}};
+					var data = {config: {}};
+					//config:{'test-gdcdocs':true}
+					data.config[repoName] = checked;
 
 					saveConfig(JSON.stringify(data));
 				});
@@ -100,7 +111,7 @@
 					
 					
 					$.ajax({
-						url: URL + 'changeConfig?value='+value,
+						url: URL + 'updateConfig?value='+value,
 						method: 'get'
 					}).done(function(msg) {
 						$('#log').html(JSON.stringify(msg));
@@ -110,16 +121,16 @@
 					
 				}
 
-				$('#chkBoxCreateHtml').change(function() {
-					var checked = $('#chkBoxCreateHtml').val($(this).is(':checked'));
+				$('#chkBoxCreateHtml').click(function() {
+					var checked = $('#chkBoxCreateHtml').is(':checked');
 					var data = {config:{autoGenWebSite: checked}};
 
 					saveConfig(JSON.stringify(data));
 
 				});
 				
-				$('#chkBoxCreatePdf').change(function() {
-					var checked = $('#chkBoxCreatePdf').val($(this).is(':checked'));
+				$('#chkBoxCreatePdf').click(function() {
+					var checked = $('#chkBoxCreatePdf').is(':checked');
 					var data = {config:{autoCreatePdf: checked}};
 
 					saveConfig(JSON.stringify(data));

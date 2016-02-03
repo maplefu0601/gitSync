@@ -5,6 +5,7 @@ var https = require('https'),
 	path = require('fs'),
 	util = require('util'),
 	config = require('../config.json'),
+	Config = require('../config.js'),
 	markdown = require('./markDown.js'),
 	gitextend = require('./gitExtend.js'),
 	//sleep = require('sleep'),
@@ -186,14 +187,17 @@ router.get('/saveConfig', function(req, res) {
 	
 	var value = req.query.value;
 
-	config.saveConfig(value);
+	Config.saveConfig(value);
 });
 
 router.get('/updateConfig', function(req, res) {
 	
 	var value = req.query.value;
+	console.log(value);
+	//console.log(JSON.stringify(JSON.parse(value)));
 
-	config.updateConfig(value);
+	Config.updateConfig(value);
+	res.send(value);
 });
 
 module.exports = router;
