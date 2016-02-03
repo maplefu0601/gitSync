@@ -20,6 +20,36 @@ var Config = {
 		});
 	},
 
+	/**
+	 * updateConfig: update part of config
+	 * param data: part of config data, like {config:{autoCreatePdf:false}}
+	 * author: Raymond Fu
+	 * date: Feb 3, 2016
+	 **/
+	updateConfig : function(data) {
+		
+		var obj = JSON.parse(data);
+		for(var conf in obj) {
+			//console.log(conf+'-----'+obj[conf]+'-----'+Object.keys(obj[conf]).length);
+			if(Object.keys(obj[conf]).length > 0) {
+				for(var bb in obj[conf]) {//only support 2 levels now
+					//console.log(bb+'====='+obj[conf][bb]);
+					config[conf][bb] = obj[conf][bb];	
+				}	
+			}	
+		}
+
+		var data = JSON.stringify(config);
+		fs.writeFile('./config.json', data, function(err) {
+			
+			if(err) {
+				console.log('error updating to config.json. '+ err);
+			} else {
+				console.log('updated config.json. \n' + data);
+			}
+		});
+	},
+
 	saveConfig : function(data) {
 		
 		fs.writeFile('./config.json', data, function(err) {
@@ -52,6 +82,7 @@ function createFolder(dirPath, mode, callback) {
 //for test
 //config.config.autoCreatePdf = true;
 //Config.saveConfig(JSON.stringify(config));
+//Config.updateConfig(JSON.stringify({config:{autoGenWebSite:true}}));
 
 module.exports = Config;
 
