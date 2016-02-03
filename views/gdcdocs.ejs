@@ -85,21 +85,44 @@
 					});
 				});
 
-				$('#chkBoxCreateHtml').change(function() {
-					var checked = $('#chkBoxCreateHtml').val($(this).is(':checked'));
+				//change if need auto pull data when repository changed
+				$('#chkBoxGitPull').change(function() {
+				
+					var checked = $('#chkBoxGitPull').val($(this).is(':checked'));
+					//add resopitory name to the list
+					var data = {config: {repositoryNameAutoMonitorGitChange:['test-gdcdocs']}};
 
+					saveConfig(JSON.stringify(data));
+				});
+
+				//value = {pdf:{destPath:'/home/ubuntu/test'}}
+				function saveConfig(value) {
+					
+					
 					$.ajax({
-						url: URL + 'autoCreateHtml?checked='+checked,
+						url: URL + 'changeConfig?value='+value,
 						method: 'get'
 					}).done(function(msg) {
 						$('#log').html(JSON.stringify(msg));
 					}).fail(function(msg) {
 						$('#log').html(JSON.stringify(msg));
 					});
+					
+				}
+
+				$('#chkBoxCreateHtml').change(function() {
+					var checked = $('#chkBoxCreateHtml').val($(this).is(':checked'));
+					var data = {config:{autoGenWebSite: checked}};
+
+					saveConfig(JSON.stringify(data));
+
 				});
 				
 				$('#chkBoxCreatePdf').change(function() {
 					var checked = $('#chkBoxCreatePdf').val($(this).is(':checked'));
+					var data = {config:{autoCreatePdf: checked}};
+
+					saveConfig(JSON.stringify(data));
 				});
 			})
 		</script>
