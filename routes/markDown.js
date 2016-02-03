@@ -42,7 +42,7 @@ var MarkDown = function(req, res) {
 			var self = this;
 			console.log('converting '+ name);
 			var nodePath = process.cwd() + '/public/' + name + '.pdf';
-			var cmd = util.format('cd %s && mkdocs2pandoc > %s && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s && ln -sf %s %s', dataFolder, name+'.pd', pdfFolder+'.pdf', name+'.pd', pdfFolder+'.pdf', nodePath);
+			var cmd = util.format('cd %s && mkdocs2pandoc > %s && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s && ln -sf %s %s', dataFolder, pdfFolder+'.pd', pdfFolder+'.pdf', pdfFolder+'.pd', pdfFolder+'.pdf', nodePath);
 			
 			console.log(cmd);
 			var child = exec(cmd);
