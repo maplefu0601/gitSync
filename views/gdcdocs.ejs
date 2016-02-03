@@ -127,11 +127,17 @@
 					}
 					var checked = $('#chkBoxGitPull').is(':checked');
 					//add resopitory name to the list
-					var data = {config: {}};
-					//config:{'test-gdcdocs':true}
-					data.config[repoName] = checked;
+					var data = {hooks: {}};
+					//hooks:{'test-gdcdocs':true}
+					data.hooks[repoName] = checked;
 
 					saveConfig(JSON.stringify(data));
+
+					if(checked) {
+						$.ajax({url: URL+'createHook?name='+repoName});	
+					} else {
+						$.ajax({url: URL + 'deleteHook?name='+repoName});	
+					}
 				});
 
 				//value = {pdf:{destPath:'/home/ubuntu/test'}}

@@ -107,18 +107,19 @@ router.get('/testgit', function(req, res) {
 });
 
 //--/createHook?name=test-gdcdocs
-router.get('/createHook', function(req, res) {
+router.get('/createHook', createHook);
+function createHook(req, res) {
 	var name = req.query.name;
 	console.log('----create hook for----'+name);
 	GitHubRepoHook(Params.Username, name).listHook(function(error, ret) {
 		console.log("hooks list: "+JSON.stringify(ret));
-		if(!ret) {
+		if(!ret || ret.length == 0) {
 			options = {
 				"name":"web",
 				"active":true,
 				"events":["push", "push_request"],
 				"config":{
-					"url":"http://52.32.211.9:6600/gitChanged?name="+name,
+					"url":"http://54.69.251.157:6600/gitChanged?name="+name,
 					"content_type":"json"
 				}
 			}
@@ -128,7 +129,24 @@ router.get('/createHook', function(req, res) {
 		}
 	});
 	res.jsonp({success:"ok"});
-});
+};
+
+router.get('/deleteHook', deleteHook);
+function deleteHook(req, res) {
+	var name = req.query.name;
+	console.log('----delete hook for----'+name);
+	GitHubRepoHook(Params.Username, name).listHook(function(error, ret) {
+		console.log("hooks list: "+JSON.stringify(ret));
+		if(ret && ret.length) {
+			var id = ret[0].id;
+
+			GitHubRepoHook(Params.Username, name).deleteHook(id, function(error, hook) {
+				console.log('deleted a new hook for: '+name+'\n'+hook);
+			});
+		}
+	});
+	res.jsonp({success:"ok"});
+};
 
 router.post('/gitchanged', doGitChanged);
 router.get('/gitchanged', doGitChanged);
