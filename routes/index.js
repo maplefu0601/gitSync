@@ -6,6 +6,7 @@ var https = require('https'),
 	util = require('util'),
 	config = require('../config.json'),
 	Config = require('../config.js'),
+	Yaml = require('./yaml.js'),
 	markdown = require('./markDown.js'),
 	gitextend = require('./gitExtend.js'),
 	//sleep = require('sleep'),
@@ -222,11 +223,24 @@ router.get('/gdcdocs', function(req, res) {
 	GitHubUser.getAllRepos(function(repos) {
 		console.log(repos);
 		res.render('gdcdocs', {
+			yaml: [],
 			repos: repos,
 			linkWeb: '',
 			linkPdf: ''
 		});	
 	});	
+});
+
+router.get('/getYaml', function(req, res) {
+
+	var name = req.query.name;
+	var dataFolder = config.gitdata.gitFolder + name;
+	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
+		//console.log(data);
+		res.render('gdcdocs', {
+			yaml: data
+		})
+	});
 });
 
 module.exports = router;
