@@ -237,10 +237,15 @@ router.get('/getYaml', function(req, res) {
 	var dataFolder = config.gitdata.gitFolder + name;
 	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
 		//console.log(data);
-		res.render('gdcdocs', {
-			yaml: data
-		})
+		res.send(data);
+		//res.end();
 	});
+});
+
+router.get('/getMdContent/:name', function(req, res) {
+	var name = req.params.name;
+	console.log('getting md file '+name);
+	res.send(name);
 });
 
 module.exports = router;

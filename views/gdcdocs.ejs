@@ -4,7 +4,7 @@
 	<title>GDC DOCS MANAGEMENT</title>
 </head>
 <body>
-	<h1>GDC DOCS MANAGEMENT TEST</h1>
+	<h5>GDC DOCS MANAGEMENT TEST</h1>
 	
 	<div>
 		<label><input type='checkbox' checked id='chkBoxGitPull'>Monitor Git Changes</label><br>
@@ -37,9 +37,6 @@
 	<div id='idContainer'>
 		<div id='idIndex'>YAML Index
 			<ul>
-				<% yaml.forEach(function(link) { %>
-					<li><%= link %></li>
-				<% }); %>
 			</ul>
 		</div>
 		<div id='idContent'>MD File Content</div>
@@ -63,12 +60,69 @@
 			font-size:10px;
 			vertical-align: top;
 		}
+		.item {
+			position: relative;
+			left: 20px;
+		}
+		.name {
+			font-weight: bold;	
+		}
 	</style>
 
     <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
 	    <script type="text/javascript">
+			/*
+				<% yaml.forEach(function(link) { %>
+					<li><%= link %></li>
+				<% }); %>
+			*/
 			var URL = 'http://54.69.251.157:6600/';
 		    $(document).ready(function() {
+
+				function reverseYaml(data) {
+					var ret = data.replace(/"([^"]*\.md)"/gi, '"<a href=\'getMdContent/$1\'>$1</a>"' );
+
+					console.log(data);
+					console.log(ret);
+					var retData = JSON.parse(ret);
+
+					function htmlObject(obj) {
+					  try {
+						var html = '';
+						//console.log('@@@@@'+html);
+						if(Object.prototype.toString.call(obj) == '[object Array]') {
+
+						  for(var i=0;i<obj.length;++i) {
+
+							  html += htmlObject(obj[i]);
+						  }
+						} else {
+							for (var p in obj) {
+							  //console.log((typeof obj[p] =='object') +'----'+(obj[p].length));
+							  if ((typeof obj[p] =='object') && (obj[p].length > 0)) {
+
+								html += '<div class="item"><span class="name">' + p + ' : </span>';
+								html += htmlObject(obj[p]);
+							  
+							  } else {
+
+								html += '<div class="item"><span class="name">' + p + ' : </span>' + obj[p];
+								
+							  }
+							  html += '</div>';
+							  
+							}
+						}
+						//console.log('***'+html);
+						return html;
+
+					  } catch (err) {
+						alert(err);
+					  }
+					}
+
+					return htmlObject(retData);
+				}
 
 				$('#btnGetYaml').click(function() {
 					var name = $('#repoName').val();
@@ -77,10 +131,10 @@
 						return;
 					}
 					$.ajax({url:URL+'getYaml?name='+name}).done(function(msg) {
-						console.log('get yaml----'+JSON.stringify(msg));
-						$('idIndex').html(JSON.stringify(msg));
+						//alert('get yaml----'+JSON.stringify(msg));
+						$('#idIndex ul').html(reverseYaml(JSON.stringify(msg)));
 					}).fail(function(msg) {
-						$('idIndex').html(JSON.stringify(msg));
+						$('#idIndex ul').html(JSON.stringify(msg));
 					});
 				});
 

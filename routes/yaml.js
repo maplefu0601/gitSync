@@ -12,9 +12,10 @@ var Yaml = function(req, res) {
 			
 			var data = yaml.safeLoad(fs.readFileSync(name, 'utf8'));
 
-			//console.log(data);
+			//data is an object already
+			//console.log(data.site_name);
 			if(func) {
-				func(JSON.parse(data));	
+				func(data);	
 			}
 		},
 
