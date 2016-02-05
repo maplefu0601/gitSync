@@ -7,6 +7,7 @@ var https = require('https'),
 	config = require('../config.json'),
 	Config = require('../config.js'),
 	Yaml = require('./yaml.js'),
+	MarkDoc = require('./mkdoc.js'),
 	markdown = require('./markDown.js'),
 	gitextend = require('./gitExtend.js'),
 	//sleep = require('sleep'),
@@ -242,11 +243,34 @@ router.get('/getYaml', function(req, res) {
 	});
 });
 
-router.get('/getMdContent/:name', function(req, res) {
-	var name = req.params.name;
-	console.log('getting md file '+name);
-	res.send(name);
+router.get('/getMdContent', function(req, res) {
+	var folderName = req.query.folder;
+	var name = req.query.name;
+	console.log('getting md file '+folderName + '/docs/'+ name);
+	var dataFolder = config.gitdata.gitFolder + folderName + '/docs';
+	new MarkDoc(req, res).getDocContent(name, dataFolder, function(data) {
+		//res.send(data);
+		res.writeHead(200, {'Content-Type': 'text/html'});
+		
+		res.write(data);
+		res.end();
+		//res.send(data);
+		//res.render('mkdocContent', {name: name, content: data});
+	});
+	
 });
-
+/*
+router.get('/getMdContent/:folder/:name', function(req, res) {
+	var folderName = req.params.folder;
+	var name = req.params.name;
+	console.log('getting md file '+folderName + '/docs/'+ name);
+	var dataFolder = config.gitdata.gitFolder + folderName + '/docs';
+	new MarkDoc(req, res).getDocContent(name, dataFolder, function(data) {
+		//res.send(data);
+		res.render('mkdocContent', {name: name, content: data});
+	});
+	
+});
+*/
 module.exports = router;
 

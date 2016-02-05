@@ -56,8 +56,8 @@
 			display: inline-block;
 			border: 1px solid green;
 			height: 100%;
-			width: 49%;
-			font-size:10px;
+			width: 100%;
+			font-size:16px;
 			vertical-align: top;
 		}
 		.item {
@@ -79,8 +79,9 @@
 			var URL = 'http://54.69.251.157:6600/';
 		    $(document).ready(function() {
 
-				function reverseYaml(data) {
-					var ret = data.replace(/"([^"]*\.md)"/gi, '"<a href=\'getMdContent/$1\'>$1</a>"' );
+				function reverseYaml(folderName, data) {
+					//var ret = data.replace(/"([^"]*\.md)"/gi, '"<a href=\'getMdContent/'+folderName+'/$1\'>$1</a>"' );
+					var ret = data.replace(/"([^"]*\.md)"/gi, '"<a target=\'_blank\' href=\'getMdContent?folder='+folderName+'&&name=$1\'>$1</a>"' );
 
 					console.log(data);
 					console.log(ret);
@@ -132,7 +133,7 @@
 					}
 					$.ajax({url:URL+'getYaml?name='+name}).done(function(msg) {
 						//alert('get yaml----'+JSON.stringify(msg));
-						$('#idIndex ul').html(reverseYaml(JSON.stringify(msg)));
+						$('#idIndex ul').html(reverseYaml(name, JSON.stringify(msg)));
 					}).fail(function(msg) {
 						$('#idIndex ul').html(JSON.stringify(msg));
 					});
