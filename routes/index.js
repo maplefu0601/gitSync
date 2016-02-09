@@ -9,6 +9,7 @@ var https = require('https'),
 	Yaml = require('./yaml.js'),
 	MarkDoc = require('./mkdoc.js'),
 	markdown = require('./markDown.js'),
+	MkdocBook = require('./mkdocBook.js'),
 	gitextend = require('./gitExtend.js'),
 	//sleep = require('sleep'),
 	events = require('events'),
@@ -238,6 +239,7 @@ router.get('/getYaml', function(req, res) {
 	var dataFolder = config.gitdata.gitFolder + name;
 	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
 		//console.log(data);
+		new MkdocBook(req, res).refreshYamlBook(name, data);
 		res.send(data);
 		//res.end();
 	});
