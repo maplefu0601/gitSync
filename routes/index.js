@@ -239,7 +239,7 @@ router.get('/getYaml', function(req, res) {
 	var dataFolder = config.gitdata.gitFolder + name;
 	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
 		//console.log(data);
-		new MkdocBook(req, res).refreshYamlBook(name, data);
+		new MkdocBook(req, res).refreshYamlBook(name, data, dataFolder);
 		res.send(data);
 		//res.end();
 	});
