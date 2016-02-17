@@ -276,22 +276,21 @@ router.post('/updateMdContent', function(req, res) {
 	var postData = '';
 
 	req.on('data', function(data) {
-		console.log('-------data----');
 		postData += data;	
 	});
 
 	req.on('end', function() {
-		console.log('-----end---');
 		var bodyData = JSON.parse(postData);
-		console.log(bodyData);
+		//console.log(bodyData);
+		res.send('ok-success.');
 
 		var mdName = bodyData.name;
 		var mdData = bodyData.content;
 		var bookFolder = bodyData.folder;
 		var dataFolder = config.gitdata.gitFolder + bookFolder + '/docs/';
 		
-		console.log(mdName);
-		fs.writeFile(dataFolder+mdName, mdData, 'utf8', function(err) {
+		console.log(dataFolder+mdName);
+		path.writeFile(dataFolder+mdName, mdData, 'utf8', function(err) {
 			if(err) {
 				console.log('something error in writing file '+ dataFolder+'\n'+err);	
 			} else {
