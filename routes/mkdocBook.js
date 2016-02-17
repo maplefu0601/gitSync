@@ -7,7 +7,7 @@ var GdcBookUrl = 'http://gdcdoc.rfu.local/mkdoc_book/new';
 
 var MkdocBook = function(req, res) {
 
-	function saveFile(name, data, dataFolder, func) {
+	function saveFile(name, data, dataFolder, docFolder, func) {
 		console.log('saving '+name);
 		fs.writeFile(name, data, function(err) {
 			if(err) {
@@ -18,18 +18,18 @@ var MkdocBook = function(req, res) {
 			console.log('saved file '+ name);
 
 			if(func) {
-				func(name, dataFolder);	
+				func(name, dataFolder, docFolder);	
 			}
 		});	
 	};
 
-	function sendFile(name, dataFolder, func) {
+	function sendFile(name, dataFolder, docFolder, func) {
 		request({
 			url: GdcBookUrl,
 			method: 'POST',
 			json: true,
 			headers: {'Authorization':'Basic cmZ1OktldmluNGZ1'},
-			form: {"name":name, "datafolder":dataFolder}
+			form: {"name":name, "datafolder":dataFolder, "bookfolder":docFolder}
 		}, function(err, response, body) {
 			if(err) {
 				console.log('error sending request to '+GdcBookUrl+'---error:'+err);	
@@ -48,7 +48,7 @@ var MkdocBook = function(req, res) {
 		refreshYamlBook : function(name, data, dataFolder) {
 			var fileName = JsonPath + name + '.json';
 			var base64Data = new Buffer(JSON.stringify(data)).toString('base64');
-			saveFile(fileName, base64Data, dataFolder, sendFile);
+			saveFile(fileName, base64Data, dataFolder, name, sendFile);
 		},
 	};
 };

@@ -173,6 +173,11 @@ function doGitChanged(req, res) {
 				if(autoGenPdf) {
 					doMarkdown(req, res);	
 				}
+
+				var autoGenBook = config.config.autoCreateBook;
+				if(autoGenBook) {
+					doYaml(req, res);	
+				}
 			}));
 		} catch(err) {
 			console.log('git change error: '+err);
@@ -234,16 +239,19 @@ router.get('/gdcdocs', function(req, res) {
 });
 
 router.get('/getYaml', function(req, res) {
+	doYaml(req, res);
+});
 
+function doYaml(req, res) {
 	var name = req.query.name;
 	var dataFolder = config.gitdata.gitFolder + name;
 	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
 		//console.log(data);
 		new MkdocBook(req, res).refreshYamlBook(name, data, dataFolder);
-		res.send(data);
+	//	res.send(data);
 		//res.end();
 	});
-});
+};
 
 router.get('/getMdContent', function(req, res) {
 	var folderName = req.query.folder;
@@ -260,6 +268,40 @@ router.get('/getMdContent', function(req, res) {
 		//res.render('mkdocContent', {name: name, content: data});
 	});
 	
+});
+
+router.post('/updateMdContent', function(req, res) {
+	console.log('------update------'+req.body.name);
+	
+	var postData = '';
+
+	req.on('data', function(data) {
+		console.log('-------data----');
+		postData += data;	
+	});
+
+	req.on('end', function() {
+		console.log('-----end---');
+		var bodyData = JSON.parse(postData);
+		console.log(bodyData);
+
+		var mdName = bodyData.name;
+		var mdData = bodyData.content;
+		var bookFolder = bodyData.folder;
+		var dataFolder = config.gitdata.gitFolder + bookFolder + '/docs/';
+		
+		console.log(mdName);
+		fs.writeFile(dataFolder+mdName, mdData, 'utf8', function(err) {
+			if(err) {
+				console.log('something error in writing file '+ dataFolder+'\n'+err);	
+			} else {
+				var cmd = util.format('cd %s && git commit %s -m"update content from book" && git push');
+				exec(cmd, function(error, stdout, stderr) {
+					console.log(stdout);	
+				});
+			}
+		});
+	});
 });
 /*
 router.get('/getMdContent/:folder/:name', function(req, res) {
