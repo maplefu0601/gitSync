@@ -294,7 +294,8 @@ router.post('/updateMdContent', function(req, res) {
 			if(err) {
 				console.log('something error in writing file '+ dataFolder+'\n'+err);	
 			} else {
-				var cmd = util.format('cd %s && git commit %s -m"update content from book" && git push');
+				var cmd = util.format('cd %s && sudo git commit %s -m"update content from book" && sudo git push', dataFolder, mdName);
+				console.log(cmd);
 				exec(cmd, function(error, stdout, stderr) {
 					console.log(stdout);	
 				});
