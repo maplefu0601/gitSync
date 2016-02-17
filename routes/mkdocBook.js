@@ -24,6 +24,7 @@ var MkdocBook = function(req, res) {
 	};
 
 	function sendFile(name, dataFolder, docFolder, func) {
+console.log('name:'+name+'\ndatafolder:'+dataFolder+'\ndocFolder:'+docFolder);
 		request({
 			url: GdcBookUrl,
 			method: 'POST',

@@ -246,7 +246,7 @@ function doYaml(req, res) {
 	var name = req.query.name;
 	var dataFolder = config.gitdata.gitFolder + name;
 	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
-		//console.log(data);
+		console.log(data);
 		new MkdocBook(req, res).refreshYamlBook(name, data, dataFolder);
 	//	res.send(data);
 		//res.end();
@@ -271,7 +271,7 @@ router.get('/getMdContent', function(req, res) {
 });
 
 router.post('/updateMdContent', function(req, res) {
-	console.log('------update------'+req.body.name);
+	console.log('------update------');
 	
 	var postData = '';
 
@@ -290,6 +290,8 @@ router.post('/updateMdContent', function(req, res) {
 		var dataFolder = config.gitdata.gitFolder + bookFolder + '/docs/';
 		
 		console.log(dataFolder+mdName);
+		//console.log(mdData);
+				
 		path.writeFile(dataFolder+mdName, mdData, 'utf8', function(err) {
 			if(err) {
 				console.log('something error in writing file '+ dataFolder+'\n'+err);	
