@@ -33,7 +33,7 @@ console.log('name:'+name+'\ndatafolder:'+dataFolder+'\ndocFolder:'+docFolder+'\n
 			method: 'POST',
 			json: true,
 			headers: {'Authorization':'Basic cmZ1OktldmluNGZ1'},
-			form: {"name":name, "datafolder":dataFolder, "bookfolder":docFolder, "gitrepourl:"repoUrl}
+			form: {"name":name, "datafolder":dataFolder, "bookfolder":docFolder, "gitrepourl":repoUrl}
 		}, function(err, response, body) {
 			if(err) {
 				console.log('error sending request to '+GdcBookUrl+'---error:'+err);	

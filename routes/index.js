@@ -155,18 +155,22 @@ function deleteHook(req, res) {
 router.post('/createNewMkdocBook', doGitChangedSSH);
 router.get('/createNewMkdocBook', doGitChangedSSH);
 
+function getRepositoryFolderName(repoUrl) {
+//src: git@bitbucket.org:Raymond_Fu/doc-demo.git
+//des: git.bitbucket.org.Raymond_Fu.doc-demo.git
+//src: git@github.com:maplefu/docFromJson.git 
+//des: git.github.com.maplefu.docFromJson.git
+
+return repoUrl.replace(/[@:\/]/g, '.');
+	
+}
 //given repository url, could from git hub or bitbucket---git@bitbucket.org:jyamada/col.git
 function doGitChangedSSH(req, res) {
 
 	var gitRepoUrl = req.query.gitRepoUrl;
-	var name = gitRepoUrl.match(/\/(.*)\.git/);
-	if(name && name.length > 1) {
-		name = name[1];	
-	} else {
-		console.log('not a valid git repository.--- '+gitRepoUrl);
-		res.send('fail');
-		return;
-	}
+	
+	//var name = gitRepoUrl.match(/\/(.*)\.git/);
+	var name = getRepositoryFolderName(gitRepoUrl);
 	req.query.name = name;
 	console.log('query.name='+req.query.name);
 	console.log("------git changed-------"+gitRepoUrl);
@@ -190,6 +194,7 @@ function doGitChangedSSH(req, res) {
 			if(autoGenBook) {
 				doYaml(req, res);	
 			}
+			res.end();
 		}));
 	} catch(err) {
 		console.log('git change error: '+err);
@@ -200,7 +205,7 @@ function doGitChangedSSH(req, res) {
 
 router.post('/gitchanged', doGitChanged);
 router.get('/gitchanged', doGitChanged);
-
+//not working now, can only work from '/createNewMkdocBook', unless the name was changed to full repository name
 function doGitChanged(req, res) {
 	var folder = req.query.name;
 	console.log("------git changed-------"+folder);
@@ -233,6 +238,7 @@ function doGitChanged(req, res) {
 	});
 }
 
+//not working now, can only work from '/createNewMkdocBook', unless the name was changed to full repository name
 router.get('/markdown', doMarkdown);
 function doMarkdown(req, res) {
 	var name = req.query.name;
@@ -244,6 +250,7 @@ function doMarkdown(req, res) {
 
 };
 
+//not working now, can only work from '/createNewMkdocBook', unless the name was changed to full repository name
 router.get('/generateHtml', doGenerateHtml);
 function doGenerateHtml(req, res) {
 
@@ -285,6 +292,7 @@ router.get('/gdcdocs', function(req, res) {
 	});	
 });
 
+//not working now, can only work from '/createNewMkdocBook', unless the name was changed to full repository name
 router.get('/getYaml', function(req, res) {
 	doYaml(req, res);
 });
@@ -345,7 +353,7 @@ router.post('/updateMdContent', function(req, res) {
 			if(err) {
 				console.log('something error in writing file '+ dataFolder+'\n'+err);	
 			} else {
-				var cmd = util.format('cd %s && sudo git commit %s -m"update content from book" && sudo git push', dataFolder, mdName);
+				var cmd = util.format('cd %s && git commit %s -m"update content from book" && git push', dataFolder, mdName);
 				console.log(cmd);
 				exec(cmd, function(error, stdout, stderr) {
 					console.log(stdout);	
