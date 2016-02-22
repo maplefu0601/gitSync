@@ -28,12 +28,12 @@ var MarkDown = function(req, res) {
 	return {
 		convertToPd : function(folder) {
 			var pd = folder + '.pd';
-			exec(util.format('cd %s && mkdocs2pandoc > %s',folder, pd), catchError);
+			exec(util.format('cd %s && sudo mkdocs2pandoc > %s',folder, pd), catchError);
 			return pd;
 		},
 
 		pdToPdf : function(folder, pd, pdf) {
-			var cmd = util.format('cd %s && pwd && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s', folder, pdf, pd);
+			var cmd = util.format('cd %s && pwd && sudo pandoc --toc -f markdown+grid_tables+table_captions -o %s %s', folder, pdf, pd);
 			console.log(cmd);
 			return exec(cmd, catchError);
 		},
@@ -42,7 +42,7 @@ var MarkDown = function(req, res) {
 			var self = this;
 			console.log('converting '+ name);
 			var nodePath = process.cwd() + '/public/' + name + '.pdf';
-			var cmd = util.format('cd %s && mkdocs2pandoc > %s && pandoc --toc -f markdown+grid_tables+table_captions -o %s %s && ln -sf %s %s', dataFolder, pdfFolder+'.pd', pdfFolder+'.pdf', pdfFolder+'.pd', pdfFolder+'.pdf', nodePath);
+			var cmd = util.format('cd %s && sudo mkdocs2pandoc > %s && sudo pandoc --toc -f markdown+grid_tables+table_captions -o %s %s && sudo ln -sf %s %s', dataFolder, pdfFolder+'.pd', pdfFolder+'.pdf', pdfFolder+'.pd', pdfFolder+'.pdf', nodePath);
 			
 			console.log(cmd);
 			var child = exec(cmd);
@@ -72,7 +72,7 @@ var MarkDown = function(req, res) {
 				//res.render('gdcdocs', {'linkWeb': name, 'linkPdf':''});
 			console.log('generate website from '+dataFolder+' to '+htmlFolder+' for '+name);
 			var nodePath = process.cwd() + '/public/'+name;
-			var cmd = util.format('cd %s && mkdocs build -d %s && ln -sf %s %s', dataFolder, htmlFolder, htmlFolder, nodePath);
+			var cmd = util.format('cd %s && sudo mkdocs build -d %s && sudo ln -sf %s %s', dataFolder, htmlFolder, htmlFolder, nodePath);
 			console.log(cmd);
 			newExec(cmd, function(stdout) {
 				console.log('--------->-'+stdout);

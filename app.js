@@ -68,6 +68,7 @@ app.use(function(err, req, res, next) {
 app.listen(6600, function () {
 	console.log('app listening on port 6600!');
 	config.checkConfig();
+	//console.log(config.folders()['bookFileFolder']);
 });
 
 module.exports = app;

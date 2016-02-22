@@ -20,6 +20,7 @@ var GitHub = gitextend.gitHub;
 var GitHubRepoHook = gitextend.gitHubRepoHook;
 var GitHubUser = gitextend.gitHubUser;
 var MarkDown = markdown;
+var Folders = Config.folders();
 /*
 var github = new GitHubApi({
 	protocol: "https",
@@ -151,6 +152,52 @@ function deleteHook(req, res) {
 	res.jsonp({success:"ok"});
 };
 
+router.post('/createNewMkdocBook', doGitChangedSSH);
+router.get('/createNewMkdocBook', doGitChangedSSH);
+
+//given repository url, could from git hub or bitbucket---git@bitbucket.org:jyamada/col.git
+function doGitChangedSSH(req, res) {
+
+	var gitRepoUrl = req.query.gitRepoUrl;
+	var name = gitRepoUrl.match(/\/(.*)\.git/);
+	if(name && name.length > 1) {
+		name = name[1];	
+	} else {
+		console.log('not a valid git repository.--- '+gitRepoUrl);
+		res.send('fail');
+		return;
+	}
+	req.query.name = name;
+	console.log('query.name='+req.query.name);
+	console.log("------git changed-------"+gitRepoUrl);
+	Params.init(req, res);
+	console.log('start.........'+name);	
+	var dataFolder = Folders['gitFolder'];//config.gitdata.gitFolder;
+	try {
+		path.exists(dataFolder + name, new GitHub(req, res).getGit(dataFolder, name, gitRepoUrl, function(d) {
+			var autoGenWeb = config.config.autoGenWebSite;
+			
+			if(autoGenWeb) {
+				doGenerateHtml(req, res);
+			}
+
+			var autoGenPdf = config.config.autoCreatePdf;
+			if(autoGenPdf) {
+				doMarkdown(req, res);	
+			}
+
+			var autoGenBook = config.config.autoCreateBook;
+			if(autoGenBook) {
+				doYaml(req, res);	
+			}
+		}));
+	} catch(err) {
+		console.log('git change error: '+err);
+	}
+	//res.send('ok');
+}
+
+
 router.post('/gitchanged', doGitChanged);
 router.get('/gitchanged', doGitChanged);
 
@@ -160,7 +207,7 @@ function doGitChanged(req, res) {
 	Params.init(req, res);
 	GitHubUser.getRepos(folder, function(name, url) {
 		console.log('start.........'+name);	
-		var dataFolder = config.gitdata.gitFolder;
+		var dataFolder = Folders['gitFolder'];//config.gitdata.gitFolder;
 		try {
 			path.exists(dataFolder + name, new GitHub(req, res).getGit(dataFolder, name, url, function(d) {
 				var autoGenWeb = config.config.autoGenWebSite;
@@ -189,8 +236,8 @@ function doGitChanged(req, res) {
 router.get('/markdown', doMarkdown);
 function doMarkdown(req, res) {
 	var name = req.query.name;
-	var pdfFolder = config.pdf.destPath + name;
-	var dataFolder = config.gitdata.gitFolder + name;
+	var pdfFolder = Folders['destPath'] + name;//config.pdf.destPath + name;
+	var dataFolder = Folder['gitFolder'] + name;//config.gitdata.gitFolder + name;
 	console.log('-----markdown----from '+dataFolder+' to '+pdfFolder+' for '+name);
 	Params.init(req, res);
 	new MarkDown(req, res).convertToPdf(name, dataFolder, pdfFolder);
@@ -201,8 +248,8 @@ router.get('/generateHtml', doGenerateHtml);
 function doGenerateHtml(req, res) {
 
 	var name = req.query.name;
-	var dataFolder = config.gitdata.gitFolder + name;
-	var htmlFolder = config.html.sitePath + name;
+	var dataFolder = Folders['gitFoler'] + name;//config.gitdata.gitFolder + name;
+	var htmlFolder = Folders['sitePath'] + name;//config.html.sitePath + name;
 
 	console.log('generate site from '+dataFolder+' to '+htmlFolder+' for  '+name);
 
@@ -243,11 +290,12 @@ router.get('/getYaml', function(req, res) {
 });
 
 function doYaml(req, res) {
+	var repoUrl = req.query.gitRepoUrl;
 	var name = req.query.name;
-	var dataFolder = config.gitdata.gitFolder + name;
+	var dataFolder = Folders['gitFolder'] + name;//config.gitdata.gitFolder + name;
 	new Yaml(req, res).getGdcDocYaml(name, dataFolder, function(data) {
 		console.log(data);
-		new MkdocBook(req, res).refreshYamlBook(name, data, dataFolder);
+		new MkdocBook(req, res).refreshYamlBook(name, data, dataFolder, repoUrl);
 	//	res.send(data);
 		//res.end();
 	});
@@ -257,7 +305,7 @@ router.get('/getMdContent', function(req, res) {
 	var folderName = req.query.folder;
 	var name = req.query.name;
 	console.log('getting md file '+folderName + '/docs/'+ name);
-	var dataFolder = config.gitdata.gitFolder + folderName + '/docs';
+	var dataFolder = Folders['gitFolder'] + folderName + '/docs';
 	new MarkDoc(req, res).getDocContent(name, dataFolder, function(data) {
 		//res.send(data);
 		res.writeHead(200, {'Content-Type': 'text/html'});
@@ -287,7 +335,8 @@ router.post('/updateMdContent', function(req, res) {
 		var mdName = bodyData.name;
 		var mdData = bodyData.content;
 		var bookFolder = bodyData.folder;
-		var dataFolder = config.gitdata.gitFolder + bookFolder + '/docs/';
+		var repoUrl = bodyData.repourl;
+		var dataFolder = Folders['gitFolder'] + bookFolder + '/docs/';
 		
 		console.log(dataFolder+mdName);
 		//console.log(mdData);

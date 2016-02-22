@@ -7,12 +7,14 @@ var Config = {
 	
 	checkConfig : function() {
 		
-		var gitFolder = config.gitdata.gitFolder;
-		var sitePath = config.html.sitePath;
-		var destPdfPath = config.pdf.destPath;
-		var logPath = config.log.logPath;
+		var baseFolder = config.gitdata.baseFolder;
+		var gitFolder = baseFolder + config.gitdata.gitFolder;
+		var bookFileFolder = baseFolder + config.gitdata.bookFile;
+		var sitePath = baseFolder + config.html.sitePath;
+		var destPdfPath = baseFolder + config.pdf.destPath;
+		var logPath = baseFolder + config.log.logPath;
 
-		[gitFolder, sitePath, destPdfPath, logPath].forEach(function(name) {
+		[gitFolder, bookFileFolder, sitePath, destPdfPath, logPath].forEach(function(name) {
 			if(!fs.existsSync(name)) {
 				createFolder(name, 0777);
 			}
@@ -60,6 +62,24 @@ var Config = {
 				console.log('saved config.json. \n' + data);
 			}
 		});
+	},
+
+	folders : function() {
+		var baseFolder = config.gitdata.baseFolder;
+		var gitFolder = baseFolder + config.gitdata.gitFolder;
+		var bookFileFolder = baseFolder + config.gitdata.bookFile;
+		var sitePath = baseFolder + config.html.sitePath;
+		var destPdfPath = baseFolder + config.pdf.destPath;
+		var logPath = baseFolder + config.log.logPath;
+	
+		return {
+			'baseFolder': baseFolder,
+			'gitFolder' : gitFolder,
+			'bookFileFolder' : bookFileFolder,
+			'sitePath' : sitePath,
+			'destPdfPath' : destPdfPath,
+			'logPath' : logPath
+		};
 	},
 };
 
