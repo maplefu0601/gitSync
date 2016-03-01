@@ -11,6 +11,9 @@ var https = require('https'),
 	markdown = require('./markDown.js'),
 	MkdocBook = require('./mkdocBook.js'),
 	gitextend = require('./gitExtend.js'),
+	guid = require('./guid.js'),
+	repoGuids = require('../repoGuids.json'),
+	yamlJson = require('json2yaml'),
 	//sleep = require('sleep'),
 	events = require('events'),
 	emitter = new events.EventEmitter();
@@ -161,9 +164,25 @@ function getRepositoryFolderName(repoUrl) {
 //src: git@github.com:maplefu/docFromJson.git 
 //des: git.github.com.maplefu.docFromJson.git
 
-return repoUrl.replace(/[@:\/]/g, '.');
+	var ret = '';
+	if(repoUrl in repoGuids) {
+		ret = repoGuids[repoUrl];
+	} else {
+		ret = guid.guid();
+		repoGuids[repoUrl] = ret;	
+	}
+
+	var data = JSON.stringify(repoGuids);
+	path.writeFile('./repoGuids.json', data, function(err) {
+		console.log('ERROR: '+err);	
+	});
+	console.log('getRepositoryFolderName......'+ret);
+	return ret;
+
+	return repoUrl.replace(/[@:\/]/g, '.');
 	
 }
+
 //given repository url, could from git hub or bitbucket---git@bitbucket.org:jyamada/col.git
 function doGitChangedSSH(req, res) {
 
@@ -171,6 +190,11 @@ function doGitChangedSSH(req, res) {
 	
 	//var name = gitRepoUrl.match(/\/(.*)\.git/);
 	var name = getRepositoryFolderName(gitRepoUrl);
+	if(!name) {
+		console.log('createNewMkdocBook wrong repository url.---'+gitRepoUrl);
+		res.end();
+		return;
+	}
 	req.query.name = name;
 	console.log('query.name='+req.query.name);
 	console.log("------git changed-------"+gitRepoUrl);
@@ -326,8 +350,48 @@ router.get('/getMdContent', function(req, res) {
 	
 });
 
+router.post('/updateBook', function(req, res) {
+	
+	console.log('----updateBook');	
+	
+	var postData = '';
+
+	req.on('data', function(data) {
+		postData += data;	
+	});
+
+	req.on('end', function() {
+		var bodyData = JSON.parse(postData);
+		//console.log(bodyData);
+		res.send('ok-success.');
+
+		var yamlName = bodyData.name;
+		var yamlJsonData = bodyData.content;
+		var bookFolder = bodyData.folder;
+		var repoUrl = bodyData.repourl;
+		var dataFolder = Folders['gitFolder'] + bookFolder;
+		var yamlFile = Folders['gitFolder'] + bookFolder + '/' + yamlName;
+		
+		console.log(yamlFile);
+				
+		var yamlData = yamlJson.stringify(JSON.parse(yamlJsonData));
+		console.log(yamlData);
+		path.writeFile(yamlFile, yamlData, 'utf8', function(err) {
+			if(err) {
+				console.log('something error in writing file '+ yamlFile+'\n'+err);	
+			} else {
+				var cmd = util.format('cd %s && git add * && git commit -am"update content from book" && git push', dataFolder);
+				console.log(cmd);
+				exec(cmd, function(error, stdout, stderr) {
+					console.log(stdout);	
+				});
+			}
+		});
+	});
+});
+
 router.post('/updateMdContent', function(req, res) {
-	console.log('------update------');
+	console.log('------updateMdContent------');
 	
 	var postData = '';
 
